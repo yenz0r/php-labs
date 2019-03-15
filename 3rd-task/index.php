@@ -13,8 +13,18 @@
         }
           
         .container div {
-            width: 25em;
-            height: 2em;
+            width: 25%;
+        }
+
+        .container > div:after{
+            content: "";
+            display: table;
+            clear: both;
+        }
+        @media(max-width: 500px) {
+            .container {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -32,6 +42,8 @@
                 <br><input type="submit" name="add" value="Add"> <input type="reset" name="clear" value="Clear">
             </form>
             <?php
+                include('const.php');
+
                 function isIdCorrect($inputId) {
                     $numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
                     for($i = 0; $i < mb_strlen($inputId); $i++) {
@@ -41,11 +53,26 @@
                     }
                     return true;
                 }
+                function isIdUnical($inputId, $itemsArr) {
+                    if (isset($itemsArr)) { //secure from warrnings
+                        foreach ($itemsArr as $fields) {
+                            if ($fields[0] == $inputId) {
+                                return false; 
+                            }
+                        }
+                    }
+                    return true;
+                }
 
-                $file = fopen("/Users/egorpii/Sites/src/file_shop.csv", 'a') or die("Не удалось подключть файл");
+                $file = fopen("src/file_shop.csv", 'r+') or die("Не удалось подключть файл");
+
+                $itemsArr = [];
+                for($i=0; $data = fgetcsv($file, 1000,","); $i++) {
+                    $itemsArr[] = array($data[ID], $data[PRICE], $data[NAME], $data[DESCRIPTION]);
+                }
 
                 if (isset($_POST['add'])) {
-                    if (!isIdCorrect($_POST['id'])) {
+                    if ((!isIdCorrect($_POST['id'])) or (!isIdUnical($_POST['id'], $itemsArr))) {
                         echo "Status : Incorrect id..";
                     } else {
                         fputcsv($file, array($_POST['id'], $_POST['name'], $_POST['price'], $_POST['description']));
@@ -68,7 +95,7 @@
                 include('const.php');
 
                 if (isset($_POST['delete'])) {
-                    $file = fopen("/Users/egorpii/Sites/src/file_shop.csv", 'r+') or die("Не удалось подключть файл");
+                    $file = fopen("src/file_shop.csv", 'r+') or die("Не удалось подключть файл");
                     $itemsArr = [];
                     
                     $isDeleted = false;
@@ -82,7 +109,7 @@
                     
                     fclose($file);
 
-                    $file = fopen("/Users/egorpii/Sites/src/file_shop.csv", 'w+') or die("Не удалось подключть файл");
+                    $file = fopen("src/file_shop.csv", 'w+') or die("Не удалось подключть файл");
                     if (isset($itemsArr)) {
                         foreach ($itemsArr as $fields) {
                             fputcsv($file, $fields);
@@ -105,7 +132,7 @@
             <?php
                 include('const.php');
 
-                $file = fopen("/Users/egorpii/Sites/src/file_shop.csv", 'r') or die("Не удалось подключть файл");
+                $file = fopen("src/file_shop.csv", 'r') or die("Не удалось подключть файл");
                 $itemsArr = [];
                 for($i=0; $data = fgetcsv($file, 1000,","); $i++) {
                     $itemsArr[] = array($data[ID], $data[PRICE], $data[NAME], $data[DESCRIPTION]);
@@ -127,7 +154,7 @@
                 <?php
                     include('const.php');
 
-                    $file = fopen("/Users/egorpii/Sites/src/file_shop.csv", 'r') or die("Не удалось подключть файл");
+                    $file = fopen("src/file_shop.csv", 'r') or die("Не удалось подключть файл");
                     $itemsArr = [];
                     for($i=0; $data = fgetcsv($file, 1000,","); $i++) {
                         $itemsArr[] = array($data[ID], $data[PRICE], $data[NAME], $data[DESCRIPTION]);
