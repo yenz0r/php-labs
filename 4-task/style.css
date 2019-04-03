@@ -1,0 +1,76 @@
+.container {
+    display: flex;
+    justify-content: space-around;
+    padding: 2em;
+    box-sizing: border-box;
+}
+  
+.container div {
+    width: 50%;
+}
+
+.container h2 {
+    color: green;
+    text-align: center;
+}
+
+.container form{
+    width: 100%;
+    text-align: center;
+}
+
+h1 {
+    color: red;
+}
+
+table.paleBlueRows {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    font-family: "Times New Roman", Times, serif;
+    border: 1px solid #FFFFFF;
+    width: 500px;
+    height: 200px;
+    text-align: center;
+    border-collapse: collapse;
+}
+
+table.paleBlueRows td, table.paleBlueRows th {
+    border: 1px solid #6F6EFF;
+    padding: 3px 2px;
+}
+
+table.paleBlueRows tbody td {
+    font-size: 15px;
+}
+
+table.paleBlueRows tr:nth-child(even) {
+    background: #D0E4F5;
+}
+
+table.paleBlueRows thead {
+    background: #0B6FA4;
+    border-bottom: 5px solid #FFA78D;
+}
+
+table.paleBlueRows thead th {
+    font-size: 17px;
+    font-weight: bold;
+    color: #FFFFFF;
+    text-align: center;
+border-left: 2px solid #FFFFFF;
+}
+
+table.paleBlueRows thead th:first-child {
+    border-left: none;
+}
+
+table.paleBlueRows tfoot td {
+    font-size: 14px;
+}
+
+@media(max-width: 500px) {
+    .container {
+        flex-direction: column;
+    }
+}
