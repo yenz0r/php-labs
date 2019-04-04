@@ -9,7 +9,8 @@
     width: 50%;
 }
 
-.container div>p {
+.container p {
+    width: 100%;
     text-align: center;
 }
 
@@ -19,6 +20,11 @@
 }
 
 .container form{
+    width: 100%;
+    text-align: center;
+}
+
+.container h4 {
     width: 100%;
     text-align: center;
 }

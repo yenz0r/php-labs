@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Site</title>
-	<link href="style.css" rel="stylesheet">
+	<link href="sstyle.css" rel="stylesheet">
 </head>
 <body>
 	<header>
@@ -143,9 +143,7 @@
 
 			<?php
 				if (isset($_POST['findType'], $_POST['find'])) {
-					echo "<p>Sorry, but your file is empty..</p>";
-				} else {
-					if (filesize($dataFile) === 0){
+					if (filesize($dataFile) !== 0) {
 						$select = $_POST['findType'];
 						switch ($select) {
 							case 'findName':
@@ -164,25 +162,20 @@
 						$usersData = explode($separateFileCharacter, $filteredTextFromFile);
 						array_pop($usersData);
 
-						echo '
-						<br><table class="blueTable">
-						<thead>
-							<tr>
-								<th>#</th>
-								<th>Name</th>
-								<th>Email</th>
-								<th>Comment</th>
-							</tr>
-						</thead>';
 						$userIndex = 0;
 						foreach ($usersData as $userInfo) {
 							$userParams = explode($separateInfoCharacter, $userInfo);
-							if ($userParams[$indexFindParam] === $_POST['dataForFind']) {}
-								echo "<tr><td>$userIndex</td><td>$userParams[0]</td><td>$userParams[1]</td><td>$userParams[2]</td></tr>";
+							if ($userParams[$indexFindParam] === $_POST['dataForFind']) {
+								echo "<h4>Index : $userIndex</h4>";
+								echo "<li><em>Name</em> : $userParams[0]</li>";
+								echo "<li><em>Email</em> : $userParams[1]</li>";
+								echo "<li><em>Comment</em> : $userParams[2]</li>";
 								$userIndex++;
 							}
 						}
-					echo '</table>';
+					} else {
+						echo "<p>Sorry, but your file is empty..</p>";
+					}
 				}	  
 			?>  
 		</div>
