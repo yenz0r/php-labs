@@ -6,7 +6,7 @@
 	<link href="style.css" rel="stylesheet">
 </head>
 <body>
-<header>
+	<header>
 	<center><h1>Regular expressions</h1></center>
 	</header>
 	<div class="container">
@@ -22,13 +22,19 @@
 
 			<?php
 				include('defaults.php');
+
 				$emailEdittor = new EmailEdittor();
+				$userChecker = new UserChecker();
 
 				if (isset($_POST['send'])) {
-					$text = $_POST['name'] . "|" . $_POST['email'] . "|" . $emailEdittor->hideSpam($_POST['comment']) . "\n";
+					if (($emailEdittor->checkEmail($_POST['email'])) && ($userChecker->checkUserName($_POST['name']))) {
+						$text = $_POST['name'] . $separateInfoCharacter . $_POST['email'] . $separateInfoCharacter . $emailEdittor->hideSpam($_POST['comment']) . $separateFileCharacter;
+						file_put_contents($dataFile, $text, FILE_APPEND | LOCK_EX);
+						echo "<p>Status: Success!</p>";
+					} else {
+						echo "<p>Status: Incorrect user data..</p>";
+					}
 				}
-		
-				file_put_contents($dataFile, $text, FILE_APPEND | LOCK_EX);
 			?>  
 
 		</div>
@@ -38,11 +44,11 @@
 			<hr/>  
 			<?php
 				if (filesize($dataFile) === 0) {
-					echo "<h3>Sorry, but your file is empty..</h3>";
+					echo "<p>Sorry, but your file is empty..</p>";
 				} else {
 					$filteredTextFromFile = file_get_contents($dataFile);
 
-					$usersData = explode("\n", $filteredTextFromFile);
+					$usersData = explode("$separateFileCharacter", $filteredTextFromFile);
 					array_pop($usersData);
 
 					$userIndex = 0;
@@ -59,7 +65,7 @@
 							</tr>
 						</thead>';
 						foreach ($usersData as $userInfo) {
-							$userParams = explode("|", $userInfo);
+							$userParams = explode($separateInfoCharacter, $userInfo);
 							echo "<tr><td>$userIndex</td><td>$userParams[0]</td><td>$userParams[1]</td><td>$userParams[2]</td></tr>";
 							$userIndex++;
 						}
@@ -74,19 +80,110 @@
 			<hr/>  
 			<form action="<?=$_SERVER['PHP_SELF']?>" method="POST">
 				<select name="deleteType">
-					<option value="deleteID" selected>Id</option>
-					<option value="deleteName">Name</option>
+					<option value="deleteName" selected>Name</option>
 					<option value="deleteEmail">Email</option>
 				</select>
-				<br><br><input type="text" placeholder="dataForDelete" name="dataForDelete" required>
+				<br><br><input type="text" placeholder="Param" name="dataForDelete" required>
 				<br><br><input type="submit" name="delete" value="Delete"> <input type="reset" name="clear" value="Clear">
 			</form>
 
 			<?php
-				$filteredTextFromFile = file_get_contents($dataFile);
-				$usersData = explode("\n", $filteredTextFromFile);
-				array_pop($usersData);
+				if(isset($_POST['deleteType'], $_POST['delete'])){
+					$select = $_POST['deleteType'];
+					switch ($select) {
+						case 'deleteName':
+							$indexDeleteParam = 0;
+							break;
+						case 'deleteEmail':
+							$indexDeleteParam = 1;
+							break;
+						default:
+							$indexDeleteParam = -1;
+							break;
+					}
 
+					$filteredTextFromFile = file_get_contents($dataFile);
+					$usersData = explode($separateFileCharacter, $filteredTextFromFile);
+					array_pop($usersData);
+
+					$resArr = [];
+
+					$numOfDeletedComments = 0;
+
+					if (isset($usersData)) { 
+						foreach ($usersData as $userInfo) {
+							$userParams = explode($separateInfoCharacter, $userInfo);
+							if ($userParams[$indexDeleteParam] === $_POST['dataForDelete']) {
+								$numOfDeletedComments++;
+							} else {
+								array_push($resArr, $userInfo);
+							}
+						}
+					}
+
+					foreach ($resArr as $item) {
+						file_put_contents($dataFile, $item . $separateFileCharacter);
+					}
+					echo "<p>Status : deleted " . $numOfDeletedComments . " comment(s)</p>";
+				}
+			?>  
+		</div>
+
+		<div>
+			<h2>Find</h2>
+			<hr/>  
+			<form action="<?=$_SERVER['PHP_SELF']?>" method="POST">
+				<select name="findType">
+					<option value="findName" selected>Name</option>
+					<option value="findEmail">Email</option>
+				</select>
+				<br><br><input type="text" placeholder="findParam" name="dataForFind" required>
+				<br><br><input type="submit" name="find" value="Find"> <input type="reset" name="clear" value="Clear">
+			</form>
+
+			<?php
+				if (isset($_POST['findType'], $_POST['find'])) {
+					echo "<p>Sorry, but your file is empty..</p>";
+				} else {
+					if (filesize($dataFile) === 0){
+						$select = $_POST['findType'];
+						switch ($select) {
+							case 'findName':
+								$indexFindParam = 0;
+								break;
+							case 'findEmail':
+								$indexFindParam = 1;
+								break;
+							default:
+								$indexFindParam = -1;
+								break;
+						}
+						
+						$filteredTextFromFile = file_get_contents($dataFile);
+
+						$usersData = explode($separateFileCharacter, $filteredTextFromFile);
+						array_pop($usersData);
+
+						echo '
+						<br><table class="blueTable">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Name</th>
+								<th>Email</th>
+								<th>Comment</th>
+							</tr>
+						</thead>';
+						$userIndex = 0;
+						foreach ($usersData as $userInfo) {
+							$userParams = explode($separateInfoCharacter, $userInfo);
+							if ($userParams[$indexFindParam] === $_POST['dataForFind']) {}
+								echo "<tr><td>$userIndex</td><td>$userParams[0]</td><td>$userParams[1]</td><td>$userParams[2]</td></tr>";
+								$userIndex++;
+							}
+						}
+					echo '</table>';
+				}	  
 			?>  
 		</div>
 	</div>
