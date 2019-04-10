@@ -35,27 +35,29 @@
                 return "{" . $key . "=" . $value . "}";
             }
         
-            $pattern = "/\\{\\w+[=][\\w.]+\\}/ui";
+            $pattern = "/\\{\\w+=[\\w.]+\\}/ui";
             preg_match_all($pattern, $this->content, $matches);
         
             $inputParams = [];
             foreach ($matches[0] as $line) {
                 $tmp = explode("=", deleteBrackets($line));
-                $inputParams[$tmp[0]] = $tmp[1];
+                $inputParams[$tmp[1]] = $tmp[0];
             }
+            var_dump($inputParams);
 
             foreach ($inputParams as $key=>$value) 
             {
-                switch ($key) {
+                switch ($value) {
                     case 'FILE':
-                        $dataFromFile = file_get_contents($value);
-                        $this->content = str_replace(makeStartString($key, $value), $dataFromFile, $this->content);
+                        $dataFromFile = file_get_contents($key);
+                        $this->content = str_replace(makeStartString($value, $key), $dataFromFile, $this->content);
                         break;
                     case 'CONFIG':
-                        $this->content = str_replace(makeStartString($key, $value), $$value, $this->content);
+                        $this->content = str_replace(makeStartString($value, $key), $$key, $this->content);
+                        echo "===", $$value;
                         break;
                     case 'VAR':
-                        $this->content = str_replace(makeStartString($key, $value), $vars[$value], $this->content);
+                        $this->content = str_replace(makeStartString($value, $key), $vars[$key], $this->content);
                         break;
                     default:
                         echo '!!!';
