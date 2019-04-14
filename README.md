@@ -4,3 +4,4 @@
 2.  PHP "basics" (arrays/ strings/ GET and POST and other)
 3.  PHP "files and forms" (shop base/ primitive server file manager)
 4.  PHP "regular expressions" (email filter in input text)
+5.  PHP "DB mysql" (calendar/ task manager -> data stores in mysql DB)
