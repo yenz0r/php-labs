@@ -9,7 +9,7 @@
 </head>
 <body>
     <header>
-    <center><h1>MySql DataBase manager</h1></center>
+    <center><h1>MySql DataBase Manager</h1></center>
     </header>
     <div class="container">
         <div>
@@ -51,7 +51,7 @@
                             $imgUrl = "./src/green.jpg";
                             break;
                     }
-                    echo $dayType;
+
                     $mysqli->query("insert into news values ('" . $_POST['calendar'] . "', '" . $_POST['info'] . "', '" . $imgUrl
                      . "' ,'" . $dayType . "');");
                 }
@@ -125,51 +125,52 @@
             <hr/>  
             
             <form action="<?=$_SERVER['PHP_SELF']?>" method="POST">
-				<select name="findRaw">
-					<option value="editDate" selected>Date</option>
-                    <option value="editInfo">Info</option>
-                    <option value="editType">Type</option>
+				<select name="rowToUpdate">
+					<option value="rowByDate" selected>Date</option>
+                    <option value="rowByInfo">Info</option>
+                    <option value="rowByType">Type</option>
+                </select>
+
+                <select name="fieldToUpdate">
+					<option value="fieldByDate" selected>Date</option>
+                    <option value="fieldByInfo">Info</option>
+                    <option value="fieldByType">Type</option>
                 </select>
                 
-                <br><br><input type="text" placeholder="updateParam" name="dataForUpdate" required>
+                <br><br><input type="text" placeholder="valueRaw" name="valueRaw" required>
+                <br><br><input type="text" placeholder="valueField" name="valueField" required>
 
-                <br><br><select name="updateField">
-					<option value="updateDate" selected>Date</option>
-                    <option value="updateInfo">Info</option>
-                    <option value="updateType">Type</option>
-                </select>
-
-				<br><br><input type="submit" name="find" value="Find"> <input type="reset" name="clear" value="Clear">
+				<br><br><input type="submit" name="update" value="Update"> <input type="reset" name="clear" value="Clear">
             </form>
             
             <?php
-				if (isset($_POST['findRaw'], $_POST['find'])) {
-                    $fieldToShow = "";
-
-                    $select = $_POST['findRaw'];
+				if (isset($_POST['rowToUpdate'], $_POST['fieldToUpdate'], $_POST['update'])) {
+                    
+                    $rowToUpdate = "";
+                    $select = $_POST['rowToUpdate'];
                     switch ($select) {
-                        case 'editDate':
-                            $fieldToShow = "date";
+                        case 'rowByDate':
+                            $rowToUpdate = "date";
                             break;
-                        case 'editInfo':
-                            $fieldToShow = "info";
+                        case 'rowByInfo':
+                            $rowToUpdate = "info";
                             break;
-                        case 'editType':
-                            $fieldToShow = "type";
+                        case 'rowByType':
+                            $rowToUpdate = "dayType";
                             break;
                     }
                     
-                    $updateField = "";
-                    $select = $_POST['updateField'];
+                    $fieldToUpdate = "";
+                    $select = $_POST['fieldToUpdate'];
                     switch ($select) {
-                        case 'editDate':
-                            $updateField = "date";
+                        case 'fieldByDate':
+                            $fieldToUpdate = "date";
                             break;
-                        case 'editInfo':
-                            $updateField = "info";
+                        case 'fieldByInfo':
+                            $fieldToUpdate = "info";
                             break;
-                        case 'editType':
-                            $updateField = "type";
+                        case 'fieldByType':
+                            $fieldToUpdate = "dayType";
                             break;
                     }
 
@@ -179,32 +180,23 @@
                         printf("Соединение не удалось: %s\n", $mysqli->connect_error);
                         exit();
                     }
-
-
-                    $checkArr = [];
-
-                    echo "<hr />";
-                    if ($result = $mysqli->query("select * from news")) {
-                        while ($row = $result->fetch_assoc()) {
-                            if (!in_array($row["$fieldToShow"], $checkArr)) {
-                                $editFieldToShow = $row["$fieldToShow"];
-                                echo "<li><a href='./index.php?m=$editFieldToShow'>$editFieldToShow</a></li>";
-
-                                array_push($checkArr, $row['date']);
+                    
+                    if ($result = $mysqli->query("update news set " . $fieldToUpdate . "='" . $_POST['valueField'] . "' where " . $rowToUpdate . "='" . $_POST['valueRaw'] . "';")) {
+                        if ($fieldToUpdate == "dayType") {
+                            switch ($_POST['valueField']) {
+                                case 'task':
+                                    $imgUrl = "./src/red.jpg";
+                                    break;
+                                case 'holiday':
+                                    $imgUrl = "./src/blue.png";
+                                    break;
+                                case 'free':
+                                    $imgUrl = "./src/green.jpg";
+                                    break;
                             }
+                            $mysqli->query("update news set img_url='" . $imgUrl . "' where " . $rowToUpdate . "='" . $_POST['valueRaw'] . "';");
                         }
-
-                        $result->free();
-                    }
-
-                    if (empty($_GET)) {
-                        echo "Choose any link..";
-                    } else {
-
-                        if ($result = $mysqli->query("update news set '" . $updateField . "'='" . $_POST['dataForUpdate'] . "' where '" . $fieldToShow . "' ='" . $_GET['m'] . "';")) {
-                            echo "Status : Done!";
-                            $result->free();
-                        }
+                        echo "<p>Status : Done!</p>";
                     }
 
                     $mysqli->close();
@@ -222,7 +214,7 @@
                     <option value="deleteType">Type</option>
                     <option value="deleteAll">All</option>
                 </select>
-                <br><br><input type="text" placeholder="deleteParam" name="dataForDelete" required>
+                <br><br><input type="text" placeholder="deleteParam" name="dataForDelete" >
 				<br><br><input type="submit" name="delete" value="Delete"> <input type="reset" name="clear" value="Clear">
             </form>
             
@@ -237,6 +229,9 @@
                             break;
                         case 'deleteInfo':
                             $fieldToDelete = "info";
+                            break;
+                        case 'deleteType':
+                            $fieldToDelete = "dayType";
                             break;
                         case 'deleteAll':
                             $fieldToDelete = "all";
@@ -255,7 +250,7 @@
                         $query = "delete from news;";
                     }
                     if ($result = $mysqli->query($query)) {
-                        echo "Status : Deleted!";
+                        echo "<p>Status : Deleted!</p>";
                     }
                     
                 }  
