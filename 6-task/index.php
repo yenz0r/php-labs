@@ -16,8 +16,9 @@
         if (isset($_POST['user_name'], $_POST['user_pass'])) {
             $userName = $_POST['user_name'];
             $userPass = $_POST['user_pass'];
+            $userPassHash = md5($userPass);
 
-            $query = "insert into users_info (login, pass, active) values ('$userName', '$userPass', 0);";
+            $query = "insert into users_info (login, pass, active) values ('$userName', '$userPassHash', 0);";
             $result = mysqli_query($connection, $query);
             
             if ($result) {

@@ -5,8 +5,9 @@
         if (isset($_POST['user_name'], $_POST['user_pass'])) {
             $userName = $_POST['user_name'];
             $userPass = $_POST['user_pass'];
+            $passHash = md5($userPass);
 
-            $query = "select * from users_info where login='$userName' and pass='$userPass';";
+            $query = "select * from users_info where login='$userName' and pass='$passHash';";
             $result = mysqli_query($connection, $query) or die(mysqli_error($connection));
             $count = mysqli_num_rows($result);
 
@@ -37,7 +38,7 @@
             <input type="text" name="user_name" class="form-control" placeholder="Username" required>
             <input type="password" name="user_pass" class="form-control" placeholder="Password" required><br/>
             <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
-            <a class="btn btn-lg btn-primary btn-block" href="index.php">registration</a>
+            <a class="btn btn-lg btn-primary btn-block" href="index.php">Registration</a>
         </form>
     <?php
         if (isset($_SESSION['login'])) {
