@@ -6,3 +6,7 @@
 4.  PHP "regular expressions" (email filter in input text)
 5.  PHP "DB mysql" (calendar/ task manager -> data stores in mysql DB) + simple admin panel (with mysql)
 6.  PHP "Session + Cookies" (registration/login/logout + DB of registered users)
+7.  PHP "Email" (send email for users in DB)
+8.  PHP "Site statictics" 
+
++Web-site (with login/templ constructor/from and email/DB/Server Statistics)
